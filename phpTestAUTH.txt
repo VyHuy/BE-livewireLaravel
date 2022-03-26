@@ -1,0 +1,130 @@
+
+phan quyen ctv1 - sua xoa xem
+	   ctv2 - xem xoa
+15 all
+7 ctv sua xoa them
+5 ctv sua xoa
+4 ctv sua
+3 ctv xoa
+6 ctv them
+
+
+
+tìm kiếm theo khoảng giá 
+phân quyền nhị phân
+
+tách - 1111
+
+
+<?php  
+CLASS bitmask  
+{  
+    /** 
+     * This array is used to represent the users permission in usable format.    
+     *You can change remove or add valuesto suit your needs.    
+     *Just ensure that each element defaults to false. Once you have started storing  
+     *users permsisions a change to the order of this array will cause the   
+     *permissions to be incorectly interpreted.    
+     * @type Associtive array  
+     */  
+    PUBLIC $permissions = array(  
+                                "read"=>FALSE,  
+                                "write"=>FALSE,  
+                                "delete"=>FALSE,  
+                                "change_permissions"=>FALSE,  
+                                "admin"=>FALSE  
+                                );  
+  
+    /** 
+     *This function will use an integer bitmask(as created by toBitmask())  
+     *to populate the class vaiable  
+     *$this->permissions with the users permissions as boolean values.   
+     *@param int $bitmask an integer representation of the users permisions.   
+     *This integer is created by toBitmask();  
+     *@return an associatve array with the users permissions.   
+     */  
+    publicfunction getPermissions($bitMask =0)  
+    {  
+        $i =0;  
+        FOREACH($THIS->permissions AS $key => $value)  
+        {  
+            $THIS->permissions[$key]=(($bitMask & pow(2, $i))!=0)?TRUE:FALSE;  
+            //uncomment the next line if you would like to see what is happening.  
+            //echo $key . " i= ".strval($i)." power=" . strval(pow(2,$i)). "bitwise & = " . strval($bitMask & pow(2,$i))."<br>";  
+            $i++;  
+        }  
+        RETURN $THIS->permissions;  
+    }  
+  
+    /** 
+     * This function will create and return and integer bitmask based on the permission values set in 
+    *the class variable $permissions. To use you would want to set the fields in $permissions to true for the permissions you want to grant.   
+    *Then call toBitmask() and store the integer value.  Later you can pass that integer into getPermissions() to convert it back to an assoicative  
+    *array.   
+    *@return int an integer bitmask represeting the users permission set.   
+    */  
+    function toBitmask()  
+    {  
+        $bitmask =0;  
+        $i =0;  
+        FOREACH($THIS->permissions AS $key => $value)  
+        {  
+  
+            IF($value)  
+            {  
+                $bitmask += pow(2, $i);  
+            }  
+            $i++;  
+        }  
+        RETURN $bitmask;  
+    }  
+}  
+?>  
+///////////////////////////////////////////////////
+<?php  
+/** 
+ * Example usage 
+ * initiate new bitmask object 
+ */  
+$perms =NEW bitmask();  
+  
+/** 
+ * How to set permissions for a user 
+ */  
+$perms->permissions["read"]=TRUE;  
+$perms->permissions["write"]=TRUE;  
+$perms->permissions["delete"]=TRUE;  
+$perms->permissions["change_permissions"]=TRUE;  
+$perms->permissions["admin"]=FALSE;  
+  
+// converts to bitmask value to store in database or wherever  
+$bitmask = $perms->toBitmask();  //in this example it is 15  
+$sql ="insert into user_permissions (userid,permission) values(1,$bitmask)";  
+echo $sql;//you would then execute code to insert your sql.  
+?>  
+
+
+/////////////////////////////////////
+<?php  
+/** 
+ * Example usage to get the bitmask value from database or session/cache.... then put it to use. 
+ * $permarr returns an array with true/false for each array value based on the bit value 
+ */  
+$permarr = $perms->getPermissions($bitmask);  
+  
+IF($permarr["read"])  
+{  
+    echo 'user can read: <font color="green">TRUE</font>';  
+}ELSE{  
+    echo 'user can read: <font color="red">FALSE</font>';  
+}  
+  
+//user can WRITE permission  
+IF($permarr["write"])  
+{  
+    echo '<br>user can write: <font color="green">TRUE</font>';  
+}ELSE{  
+    echo '<br>user can write: <font color="red">FALSE</font>';  
+}  
+  
+?>  
