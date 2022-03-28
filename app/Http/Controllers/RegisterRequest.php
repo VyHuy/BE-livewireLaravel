@@ -25,34 +25,30 @@ class RegisterRequest extends Controller
             'password' => $hashPass,
             'role'     => 1000,
         ]);
-        if($req->validate() == true){
             return response()->json([
+                'status' =>'200',
                 'message' => 'success',
             ]);
-        }else{
-            $req->name    = '';
-            $req->email    = '';
-            $req->password = '';
-            return response()->json([
-                'message' => 'Fail',
-            ]);
-        }
         
     }
     public function login(Request $req)
     {
-        $user = User::find($req->email);
-        if (Auth::attempt(['email' => $req->email, 'password' => $req->password])) {
-
-            
+        $user = User::where('email', $req->email)->first();
+        $req->validate([
+            'email'    => 'required|email',
+            'password' => 'required',
+        ]);
+        if(!$user || !Hash::check($req->password,$user->password)) {
             return response()->json([
+                'status' =>'400',
+                'message' =>'Email or password is not correct',
+            ]);
+        }else{
+               return response()->json([ 
+                'status' =>'200',
                 'message' =>'success'
             ]);
-        } else {
-            $req->email    = '';
-            $req->password = '';
-
-            return $req->error = "Somthing wrong";
+            
         }
     }
 }

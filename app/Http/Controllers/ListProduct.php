@@ -12,7 +12,7 @@ class ListProduct extends Controller
         $p = ProductManage::find($id);
         if ($p) {
             return response()->json([
-                $p
+                $p,
             ]);
         }
     }
@@ -22,36 +22,32 @@ class ListProduct extends Controller
         $up->update([
             'title'       => $req->title,
             'description' => $req->description,
-            'img'         => $req->img->store('bota-product','public'),
+            'img'         => $req->img->store('bota-product', 'public'),
             'price'       => $req->price,
             'user_id'     => 16,
         ]);
         return response()->json([
-            $req->title,
-            $req->description,
-            $req->img->store('bota-product','public'),
-            $req->price
+            'status'  => '200',
+            'message' => 'success',
         ]);
     }
     public function addProduct(Request $req)
     {
-
         $req = ProductManage::create([
             'title'       => $req->title,
             'description' => $req->description,
-            'img'         => $req->img->store('bota-product','public'),
+            'img'         => $req->img->store('bota-product', 'public'),
             'price'       => $req->price,
             'user_id'     => 12,
         ]);
         return response()->json([
-            $req->title,
-            $req->description,
-            $req->img,
-            $req->price
+            'status'  => '200',
+            'message' => 'success',
         ]);
 
     }
-    public function deleteProduct(Request $req, $id){
+    public function deleteProduct(Request $req, $id)
+    {
         $del = ProductManage::find($req->id);
         $del->delete();
     }
